@@ -5,9 +5,13 @@
     const todoId  = ref(1);
     
 
+    const props = defineProps(["title"])
+    // defineProps(["name"])
 
     onMounted(() =>{
         console.log("初始渲染并DOM节点了")
+        // console.log(props)
+        // console.log(props.title)
     }) 
 
     onUpdated(() => {
@@ -44,6 +48,8 @@
     <div>
         <h3>生命周期</h3>
         <h4 @click="todoId++">{{ todoId }}</h4>
+        <h3>传递过来的值：{{title.name}} - {{ props }}</h3>
+        <!-- <h3>传递过来的值：{{name}} </h3> -->
     </div>
 </template>
 

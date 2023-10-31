@@ -6,9 +6,11 @@ import Temp from './components/my-demo/Temp.vue'
 import Event from "./components/my-demo/Event.vue"
 import Lifecycle from './components/my-demo/Lifecycle.vue'
 import TemplateQuote from "./components/my-demo/TemplateQuote.vue"
+import BlogPost from "./components/my-demo/BlogPost.vue"
 
 
-  import {reactive} from "vue"
+
+  import {reactive,ref} from "vue"
 
   const list = reactive([
     {msg:"haha"},
@@ -16,6 +18,14 @@ import TemplateQuote from "./components/my-demo/TemplateQuote.vue"
     {msg:"heihei"}
   ])
 
+
+  const posts = ref([
+    { id: 1, title: 'My journey with Vue' },
+    { id: 2, title: 'Blogging with Vue' },
+    { id: 3, title: 'Why Vue is so fun' }
+  ])
+
+  const postSize = ref(1)
 
 </script>
 
@@ -27,8 +37,14 @@ import TemplateQuote from "./components/my-demo/TemplateQuote.vue"
     <condition-rander/>
     <Temp v-for="item in list" :msg="item.msg"/>
     <Event/>
-    <Lifecycle/>
-    <TemplateQuote/>
+    <Lifecycle title="{name:'SpringBoot常用starter'}"/>
+    <TemplateQuote :user.prop="{name:'Quan'}" />
+    <div :style="{fontSize:postSize + 'em'}">
+      <BlogPost v-for="item in posts" :key="item.id" :title="item.title" @enlarge-text="postSize += 0.2"/>
+    </div>
+    <BlogPost>
+        slot插槽传入
+    </BlogPost>
   </div>  
 </template>
 
