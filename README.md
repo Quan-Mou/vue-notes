@@ -6,16 +6,6 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 - [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
-- - 别
-
-
-
-创建一个Vue实例
-
-每个Vue应用都是通过CreateApp() 函数创建一个新的应用实例。`createApp(根组件)`，每一个应用都需要一个根组件，其他组件作为该组件的子组件。创建应用实例后必须调用`mount()`方法挂载才会被渲染出来，mount方法接收一个"容器"，该参数可以是一个实际的DOM元素，或者使用css选择器选择的元素。`<div id=app></div>` 、 `#app`。
-
-根组件将会渲染在该容器当中，`.mount()` 方法在整个应用配置和资源注册完成后被调用，它返回的`根组件`实例而非应用实例。
-
 
 
 
@@ -865,6 +855,20 @@ fetch(url,[options])
 
 - url:访问的地址
   - options：method，header等，没有这个参数，默认是get请求
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
