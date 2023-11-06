@@ -6,9 +6,15 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 - [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
+
+
+
+
 # 1.初始Vue
 
 **该笔记代码使用组合式API风格编写。**
+
+
 
 
 
@@ -552,9 +558,150 @@ onMounted(() => {
 
 ### 14.组件基础
 
+组件将ui划分为独立的，可重用的部分，并且可以对每个部分独立的进行单独的思考。实际应用中，组件常常别层层嵌套为树状结构。可以在每个组件封装自定义的内容和逻辑。
+
+定义一个组件：
+
+当使用构建工具时一般会把Vue组件定义在一个.vue的文件中，这被叫做单文件组件（SFC）。
+
+当不使用构建工具时一个Vue组件以一个包含Vue特定选项的JavaScript对象来定义。
+
+使用组件：
+
+例如:定义了一个`ButtonBtn.vue` 子组件，需要在父组件中导入：
+
+~~~javascript
+<script setup>
+	import ButtonBtn from "./ButtonBtn.vue"     
+</script>
+~~~
+
+ButtonBtn.vue 这个组件会以默认导出的形式暴露给外部。
+
+每个组件可以使用多次，组件和组件之间是独立的，都有一个单独的实例。
+
+在单文件组件中，推荐使用`PascaCase` 命名，以此来区分原生的HTML，虽然原生html不区分大小写，但Vue单文件会在Vue编译时区分大小的。
+
+传递props：
+
+例如再写一个博客，需要一个博客组件，该组件内的布局都一样，只有标题或内容不一致，这时就需要props传递不同的标题和内容来区分。
+
+~~~java
+// BlogPost.vue
+
+<script setup>
+	const props = defindProps(['title'])    
+</script>
+<template>
+	<h3>{{props.title}}</h3>    
+</template>    
+    
+~~~
+
+`defineProps` 是一个仅 `<script setup>` 中可用的编译宏命令，并不需要显式地导入。声明的 props 会自动暴露给模板。`defineProps` 会返回一个对象，其中包含了可以传递给组件的所有 props
+
+~~~javascript
+const props = defineProps(['title'])
+console.log(props.title)
+~~~
+
+在实际应用中，我们可能在父组件中会有如下的一个博客文章数组：
+
+~~~javascript
+const posts = ref([
+  { id: 1, title: 'My journey with Vue' },
+  { id: 2, title: 'Blogging with Vue' },
+  { id: 3, title: 'Why Vue is so fun' }
+])
+~~~
+
+这种情况下，我们可以使用 `v-for` 来渲染它们：
+
+~~~javascript
+<BlogPost
+  v-for="post in posts"
+  :key="post.id"
+  :title="post.title"
+ />
+~~~
+
+监听事件：
+
+例如放大博客的字体
+
+子组件：
+
+~~~javascript
+    <div>
+        <h3>博客组件</h3>
+        <div>title:{{title}}</div>
+        <button @click="$emit('enlarge-text')">Enlarge text</button> 
+    </div>
+~~~
+
+使用$emit抛出一个自定义事件
+
+在父组件中通过v-on或者@监听抛出的事件
+
+~~~java
+const posts = ref([
+  /* ... */
+])
+
+const postFontSize = ref(1)
+    
+    
+<div :style="{fontSize:postSize + 'em'}">
+      <BlogPost v-for="item in posts" :key="item.id" :title="item.title" @enlarge-text="postSize += 0.2"/>
+    </div>
+~~~
+
+通过插槽来分配内容：
+
+~~~javascript
+// MyComponent组件内
+<template>
+  <div class="alert-box">
+    <strong>This is an Error for Demo Purposes</strong>
+    <slot /> // 插槽内容
+  </div>
+</template>
+
+// 父组件
+<MyComponent>
+    插槽内容
+</MyComponent>
+~~~
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 进阶
+
+## Web Component
+
+Web Component是一组原生Web API的统称，
+
+跳过组件解析：
+
+默认情况下，Vue会将任何非原生的HTML标签优先当做Vue组件处理，而将一个渲染自定义元素的作为后备选项，这会在开发时导致Vue抛出一个"解析组件失败的警告"
+
+
+
+传递DOM属性
 
 
 
@@ -678,6 +825,18 @@ fetch(url,[options])
 
 - url:访问的地址
   - options：method，header等，没有这个参数，默认是get请求
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

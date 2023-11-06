@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 
+    defineProps(["user"])
     
 
     const input = ref(null);
@@ -9,6 +10,8 @@ import { onMounted, ref } from "vue";
     onMounted(() => {
         console.log(input.value)
         console.log(input.value.focus())
+
+        console.log("传递的属性：" + user)
     })
     
 
@@ -16,6 +19,7 @@ import { onMounted, ref } from "vue";
         console.log(el)
     }
 </script>
+
 
 <template>
    <div>
