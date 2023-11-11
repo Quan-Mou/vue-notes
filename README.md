@@ -727,9 +727,258 @@ Web Component是一组原生Web API的统称，
 
 # 深入组件
 
+### 注册
+
+组件注册：全局注册和局部注册
+
+全局注册：
+
+使用应用实例的component方法，该方法可以链式调用，app.component('MyComponent', MyComponent)。这样就注册了一个全局组件，不需要引入直接在任意组件中使用即可。
+
+全局注册虽然方便，但是有以下几个问题：
+
+- 全局注册，但并没有使用的全局组件无法在生产打包时被自动移除 (也叫“tree-shaking”)。如果你注册了一个全局组件，但并没有实际使用，它依然会出现在打包后的js文件。
+- 全局注册在大型项目中使项目的依赖关系变得不那么明确。在父组件中使用子组件时，不太容易定位子组件的实现。和使用过多的全局变量一样，这可能会影响应用长期的可维护性。
+
+### props
+
+一个组件需要显式的声明它所需要的props，这样vue才知道外部哪些传入的是props，哪些是透析attribute。
+
+使用`defineProps()` 来声明：
+
+~~~vue
+defineProps(['title']) // 获取对象里的title属性
+const props = defineProps(['title']) 
+console.log(props.title)
+~~~
+
+除了上面的形式还可以对象的形式声明：
+
+~~~js
+defineProps({
+  title:String,
+  age:Number
+})
+~~~
+
+对于以对象形式声明中的每个属性，key 是 prop 的名称，而值则是该 prop 预期类型的构造函数。比如，如果要求一个 prop 的值是 `number` 类型，则可使用 `Number` 构造函数作为其声明的值。
+
+传递props的细节：
+
+如果你要传入一个数字，或者布尔值，数组等，需要使用 v-bind。
+
+如果你的属性需要接受一个对象的所有属性，需要使用 完整的v-bind的写法：
+
+~~~vue
+<MyComponent v-bind="对象"></MyComponent>
+~~~
+
+单向数据流：
+
+所有的 props 都遵循着**单向绑定**原则，props 因父组件的更新而变化，自然地将新的状态向下流往子组件，而不会逆向传递。这避免了子组件意外修改父组件的状态的情况，不然应用的数据流将很容易变得混乱而难以理解。
+
+另外，每次父组件更新后，所有的子组件中的 props 都会被更新到最新值，这意味着你**不应该**在子组件中去更改一个 prop。若你这么做了，Vue 会在控制台上向你抛出警告。
+
+在大多数场景下，子组件应该抛出一个自定义事件，来告诉父组件做出改变。
+
+### 组件事件
+
+触发和监听事件：
+
+使用$emit() 触发自定义事件，父组件可以通过v-on简称@来监听事件：
+
+~~~vue
+<button @click="$emit('updateV')">
+ 	发送事件 
+</button>
+
+// 父组件
+<MyComponent @updateV="callback"></MyComponent>
+~~~
+
+和原生 DOM 事件不一样，组件触发的事件**没有冒泡机制**。你只能监听直接子组件触发的事件。平级组件或是跨越多层嵌套的组件间通信，应使用一个外部的事件总线，或是使用一个[全局状态管理方案](https://cn.vuejs.org/guide/scaling-up/state-management.html)。
+
+事件参数：
+
+~~~vue
+<button @click="$emit('updateV','QuanMou',19)">
+ 	发送事件 
+</button>
+
+// 父组件
+<MyComponent @updateV="callback"></MyComponent>
+
+const callback = (name,age) => {
+
+}
+~~~
+
+所有传入 `$emit()` 的额外参数都会被直接传向监听器。举例来说，`$emit('foo', 1, 2, 3)` 触发后，监听器函数将会收到这三个参数值。
+
+声明要触发的事件：
+
+组件中可以使用`defineEmits()` 来声明它需要触发的事件，
+
+~~~vue
+<script setup>
+const emit = defineEmits(['inFocus', 'submit'])
+
+function buttonClick() {
+  emit('submit')
+}
+</script>
+~~~
+
+### 组件 v-model
+
+v-model 可以在组件上使用，以实现双向绑定。
+
+当在一个组件中v-model时：
+
+~~~vue
+<input v-model="searchText" />
+
+
+
+
+const mgs = ref("")
+
+<MyComponent v-model="mgs">
+	
+</MyComponent>
+会展开为下面的形式：
+<MyComponent :model-value="mgs" @update:model-value="newVal => {mgs = newVal}">
+	
+</MyComponent>
+
+要让上面的组件工作起来需要再MyComponent组件内部做以下操作：
+把model-value的值绑定到内部的input元素中，监听@input事件发送update:model-value事件。
+部分代码：
+defineProps(['modelValue'])
+<input :value="modelValue" @input="$emit('update:model-value',e.target.value)">
+
+
+~~~
+
+v-model的参数：
+
+默认情况下，`v-model` 在组件上都是使用 `modelValue` 作为 prop，并以 `update:modelValue` 作为对应的事件。我们可以通过给 `v-model` 指定一个参数来更改这些名字：
+
+~~~vue
+<MyComponent v-model:title="bookTitle" />
+~~~
+
+~~~vue
+<!-- MyComponent.vue -->
+<script setup>
+defineProps(['title'])
+defineEmits(['update:title'])
+</script>
+
+<template>
+  <input
+    type="text"
+    :value="title"
+    @input="$emit('update:title', $event.target.value)"
+  />
+</template>
+~~~
+
+多个v-model绑定：
+
+如果组件内有多个input时，可以传入多个v-model。
+
+做法和用法和上面一样。
+
+组件的v-model修饰符：
+
+详细看官方文档。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### 透传"attribute"
+
+#### attribute继承：
+
+透传attribute指的是传递给一个组件，确没有被该组件声明props或者emit或v-on监听器，最常见的class，id，style等。透传的 attribute 会自动被添加到根元素上。如果根元素上已有class，透传的attribute会和根元素上的class合并。
+
+#### v-on监听器继承：
+
+同样的，在组件中声明的监听器会给传递到组件内的根元素中，如果组件根元素也声明了一个监听器，那么，根元素自己的监听器和从父组件继承的监听都会生效。
+
+#### 深层组件的继承：
+
+如果一个组件内的根元素还是一个组件，会被继承。
+
+#### 禁用继承：
+
+如果你不想让组件继承attribute，可以在 组件选项中禁用：
+
+~~~vue
+defineOptions({
+	inheritAttrs:false
+})
+~~~
+
+透传的attribute会存在`$attrs` 中，可以在模板中使用。
+
+#### 多根节点的attribute继承：
+
+和单根节点组件有所不同，有着多个根节点的组件没有自动 attribute 透传行为。如果 `$attrs` 没有被显式绑定，将会抛出一个运行时警告。
+
+template
+
+```
+<CustomLayout id="custom-layout" @click="changeValue" />
+```
+
+如果 `<CustomLayout>` 有下面这样的多根节点模板，由于 Vue 不知道要将 attribute 透传到哪里，所以会抛出一个警告。
+
+~~~html
+<header>...</header>
+<main>...</main>
+<footer>...</footer>
+~~~
+
+如果 `$attrs` 被显式绑定，则不会有警告：
+
+~~~html
+<header>...</header>
+<main v-bind="$attrs">...</main>
+<footer>...</footer>
+~~~
+
+#### 在 JavaScript 中访问透传 Attributes
+
+如果需要，你可以在 `<script setup>` 中使用 `useAttrs()` API 来访问一个组件的所有透传 attribute：
+
+~~~vue
+<script setup>
+import { useAttrs } from 'vue'
+
+const attrs = useAttrs()
+</script>
+~~~
+
+### 插槽
+
+
+
+
 
 
 
